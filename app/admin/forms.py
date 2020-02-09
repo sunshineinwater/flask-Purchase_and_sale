@@ -385,7 +385,7 @@ class increasePurchaseOrders(FlaskForm):
             "placeholder": "商品名称",
             "autocomplete": "off",
             "lay-verify": "required",
-        }
+        },
     )
     num = IntegerField(
         label='进货数量',

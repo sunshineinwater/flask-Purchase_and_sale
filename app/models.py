@@ -1,7 +1,26 @@
-#-*- coding:utf-8 -*-
+# -*- coding:utf-8 -*-
 # author:Agam
 # datetime:2018-11-05
 from .apps import db
+
+# ''' 仅伪造数据时使用此处代码  '''
+# from flask import Flask
+# from flask_sqlalchemy import SQLAlchemy
+# from sqlalchemy import create_engine
+# from sqlalchemy_utils import database_exists, create_database, drop_database
+# import os
+#
+# basedir = os.path.abspath(os.path.dirname(__file__))
+# db_dir = 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
+#
+# app = Flask(__name__)
+# app.config["SQLALCHEMY_DATABASE_URI"] = db_dir
+# app.app_context().push()  # 创建app上下文，不然数据库执行报错。
+# db = SQLAlchemy()
+# db.init_app(app)
+
+""" end """
+
 
 class client(db.Model):
     __tablename__ = 'client'
@@ -43,7 +62,8 @@ class inwarehouse(db.Model):
     inwarehouse_user_name = db.Column(db.String(100))
     inwarehouse_num = db.Column(db.ForeignKey('purchase.purchase_num'), index=True)
 
-    purchase = db.relationship('Purchase', primaryjoin='inwarehouse.inwarehouse_num == Purchase.purchase_num', backref='inwarehouses')
+    purchase = db.relationship('Purchase', primaryjoin='inwarehouse.inwarehouse_num == Purchase.purchase_num',
+                               backref='inwarehouses')
 
 
 class power(db.Model):
@@ -67,10 +87,9 @@ class Purchase(db.Model):
     purchase_user_name = db.Column(db.ForeignKey('user.user_name'), index=True)
 
     good = db.relationship('goods', primaryjoin='Purchase.purchase_goods == goods.goods_name', backref='purchases')
-    supplier = db.relationship('supplier', primaryjoin='Purchase.purchase_supplier == supplier.supplier_name', backref='purchases')
+    supplier = db.relationship('supplier', primaryjoin='Purchase.purchase_supplier == supplier.supplier_name',
+                               backref='purchases')
     user = db.relationship('User', primaryjoin='Purchase.purchase_user_name == User.user_name', backref='purchases')
-
-
 
 
 class returngoods(db.Model):
@@ -85,7 +104,8 @@ class returngoods(db.Model):
     returngoods_user_name = db.Column(db.String(100))
     returngoods_num = db.Column(db.ForeignKey('purchase.purchase_num'), index=True)
 
-    purchase = db.relationship('Purchase', primaryjoin='returngoods.returngoods_num == Purchase.purchase_num', backref='returngoods')
+    purchase = db.relationship('Purchase', primaryjoin='returngoods.returngoods_num == Purchase.purchase_num',
+                               backref='returngoods')
 
 
 class Salary(db.Model):
@@ -127,7 +147,8 @@ class sealreturngoods(db.Model):
     sealreturngoods_user_name = db.Column(db.String(100))
     sealreturngoods_num = db.Column(db.ForeignKey('sales.sales_num'), index=True)
 
-    sale = db.relationship('sales', primaryjoin='sealreturngoods.sealreturngoods_num == sales.sales_num', backref='sealreturngoods')
+    sale = db.relationship('sales', primaryjoin='sealreturngoods.sealreturngoods_num == sales.sales_num',
+                           backref='sealreturngoods')
 
 
 class section(db.Model):
@@ -186,9 +207,9 @@ class User(db.Model):
     salary = db.relationship('Salary', primaryjoin='User.user_salary == Salary.salary_id', backref='users')
     section = db.relationship('section', primaryjoin='User.user_section == section.section_name', backref='users')
 
-    def check_pwd(self,pwd):
+    def check_pwd(self, pwd):
         from werkzeug.security import check_password_hash
-        return check_password_hash(self.user_pwd,pwd)
+        return check_password_hash(self.user_pwd, pwd)
 
 
 class warehouse(db.Model):
@@ -199,5 +220,14 @@ class warehouse(db.Model):
     warehouse_goods_name = db.Column(db.ForeignKey('goods.goods_name'), index=True)
     warehouse_supplier_name = db.Column(db.ForeignKey('supplier.supplier_name'), index=True)
 
-    good = db.relationship('goods', primaryjoin='warehouse.warehouse_goods_name == goods.goods_name', backref='warehouses')
-    supplier = db.relationship('supplier', primaryjoin='warehouse.warehouse_supplier_name == supplier.supplier_name', backref='warehouses')
+    good = db.relationship('goods', primaryjoin='warehouse.warehouse_goods_name == goods.goods_name',
+                           backref='warehouses')
+    supplier = db.relationship('supplier', primaryjoin='warehouse.warehouse_supplier_name == supplier.supplier_name',
+                               backref='warehouses')
+
+
+if __name__ == '__main__':
+    # 创建所有表
+    db.create_all()
+    #
+    db.session.commit()
